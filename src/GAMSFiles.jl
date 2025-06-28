@@ -570,7 +570,7 @@ function replace_reductions!(ex::Expr, sets)
                 push!(index_exprs, :($v = $rng))
             end
         end
-        return Expr(:call, gamsf2jf[ex.args[1]], Expr(:comprehension, Expr(:generator, val, index_exprs...)))
+        return Expr(:call, gamsf2jf[ex.args[1]], Expr(:generator, val, index_exprs...))
     end
     return ex
 end

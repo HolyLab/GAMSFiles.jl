@@ -6,7 +6,7 @@
 Parse files for [General Algebraic Modeling System](https://www.gams.com/) and return
 Julia expressions.
 As a matter of practicality, the only current purpose of this package is to parse
-the [problem files from Rios & Sahinidis](http://archimedes.cheme.cmu.edu/?q=dfocomp).
+the [problem files from Rios & Sahinidis](https://sahinidis.coe.gatech.edu/dfo).
 Please reach out if you'd like to help extend this package. 
 
 ## Demo
