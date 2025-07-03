@@ -11,12 +11,16 @@ include("lexer.jl")
 include("parser.jl")
 
 """
-    modex = parsegams(Module, modname, gams)
-    modex = parsegams(Module, filename)
+    modex, axs = parsegams(Module, modname, gams)
+    modex, axs = parsegams(Module, filename)
 
 Return an expression defining a module which, when evaluated (`mod = eval(modex)`),
 contains a (non-exported) function `f(x)` evaluating the objective function defined in the
 corresponding GAMS file.
+
+`axs = (x0, lo, up, isfixed)` contains the initial point `x0`, the variable lower bounds `lo`, the
+variable upper bounds `up`, and a boolean array `isfixed` indicating whether the variable is fixed
+(`true`) or not (`false`).
 """
 function parsegams(::Type{Module}, modname::Symbol, gams::Dict{String,Any})
     parseconsts!(gams)
@@ -87,6 +91,7 @@ function parsegams(::Type{Module}, modname::Symbol, gams::Dict{String,Any})
     # Initialization information
     x0 = fillr(NaN, xaxes)
     lo, up = fillr(-Inf, xaxes), fillr(Inf, xaxes)
+    isfixed = fillr(false, xaxes)
     for (i, v) in enumerate(uvars)
         vinfo = vars[v]
         for (prop, val) in vinfo.assignments
@@ -100,6 +105,7 @@ function parsegams(::Type{Module}, modname::Symbol, gams::Dict{String,Any})
                 c = val.val
                 if getname(prop) ∈ ("l", "fx")
                     x0[inds...] = c
+                    isfixed[inds...] = getname(prop) == "fx"
                 elseif getname(prop) == "lo"
                     lo[inds...] = c
                 elseif getname(prop) == "up"
@@ -108,7 +114,7 @@ function parsegams(::Type{Module}, modname::Symbol, gams::Dict{String,Any})
             end
         end
     end
-    return Expr(:toplevel, modex.args[2]), (x0, lo, up)
+    return Expr(:toplevel, modex.args[2]), (x0, lo, up, isfixed)
 end
 function parsegams(::Type{Module}, filename::AbstractString, gams::Dict{String,Any})
     bname, _ = splitext(basename(filename))

@@ -390,15 +390,20 @@ inputs = Dict("beale.gms"=>rand(2),
               "problem3.17.gms"=>rand(10),
               "problem2.18.gms"=>rand(9))
 
-cd(joinpath(@__DIR__, "gams")) do
-    for file in readdir()
-        println(file)
-        modex, axs = parsegams(Module, file)
-        mod = eval(modex)
-        f = getfield(mod, :objective)
-        x = inputs[file]
-        @assert(axes(x) == axes(axs[1]))
-        @test isreal(Base.invokelatest(f, x))
+@testset "Evaluation" begin
+    cd(joinpath(@__DIR__, "gams")) do
+        for file in readdir()
+            modex, axs = parsegams(Module, file)
+            x0, lo, hi, isfixed = axs
+            mod = eval(modex)
+            f = getfield(mod, :objective)
+            x = get(inputs, file, x0)
+            @assert(axes(x) == axes(x0))
+            @test isreal(Base.invokelatest(f, x))
+        end
+        modex, axs = parsegams(Module, "biggs3.gms")
+        x0, lo, hi, isfixed = axs
+        @test sum(isfixed) == length(x0) - 3
     end
 end
 
