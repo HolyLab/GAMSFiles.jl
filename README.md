@@ -29,10 +29,13 @@ julia> f = getglobal(m, :objective)
 objective (generic function with 1 method)
 
 # Get the initial point and the variable bounds
-julia> x0, lo, hi = axs
-([1.0, 2.0, 1.0, 1.0, 4.0, 3.0], [-Inf, -Inf, -Inf, -Inf, -Inf, -Inf], [Inf, Inf, Inf, Inf, Inf, Inf])
+julia> x0, lo, hi, isfixed = axs
+([1.0, 2.0, 1.0, 1.0, 4.0, 3.0], [-Inf, -Inf, -Inf, -Inf, -Inf, -Inf], [Inf, Inf, Inf, Inf, Inf, Inf], [false, false, false, false, false, false])
 
 # Try evaluating the objective
 julia> f(x0)
 1.624842441282596
 ```
+
+`x0` is the default initial point. `lo` contains the variable lower bounds, and `hi` the variable upper bounds.
+`isfixed` is `true` for variables that should be held constant.
